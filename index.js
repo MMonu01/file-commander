@@ -16,6 +16,7 @@ const createFile = async (file_path) => {
 const deleteFile = async (file_path) => {
   try {
     await fs.unlink(file_path);
+    console.log(file_path, "file deleted successfullly");
   } catch (err) {
     if (err.code === "ENOENT") {
       console.log("no such file to remove");
@@ -29,6 +30,7 @@ const deleteFile = async (file_path) => {
 const renameFile = async (old_file_path, new_file_path) => {
   try {
     await fs.rename(old_file_path, new_file_path);
+    console.log(old_file_path, "renamed to ", new_file_path, "successfully");
   } catch (err) {
     if (err.code === "ENOENT") {
       console.log("no such file to rename or destination does not exits");
@@ -36,6 +38,21 @@ const renameFile = async (old_file_path, new_file_path) => {
       console.log("something went wrong while renaming the file");
       console.log(err);
     }
+  }
+};
+
+const addToFile = async (file_path, content) => {
+  try {
+    const filehandle = await fs.open(file_path, "a");
+
+    await filehandle.appendFile(content);
+
+    console.log("added to the file", file_path, " with content: ", content);
+
+    filehandle.close();
+  } catch (err) {
+    console.log("something went wrong while adding content to file");
+    console.log(err);
   }
 };
 
@@ -66,7 +83,7 @@ const renameFile = async (old_file_path, new_file_path) => {
     const position = 0;
 
     await commandFileHandler.read(buff, offset, length, position);
-    const command = ("string data", buff.toString("utf-8"));
+    const command = ("string data", buff.toString("utf-8")).trim();
 
     // create a file <path>
     if (command.includes(CREATE_FILE)) {
@@ -111,8 +128,7 @@ const renameFile = async (old_file_path, new_file_path) => {
         support_content_index + support_content_length
       );
 
-      console.log("file_path", file_path);
-      console.log("content", content);
+      addToFile(file_path, content);
     }
   });
 
