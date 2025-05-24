@@ -5,20 +5,23 @@ const createFile = async (file_path) => {
   try {
     const existingfilehandle = await fs.open(file_path, "r");
     existingfilehandle.close();
-    console.log("file is already created");
+    console.log(file_path, "file is already created");
   } catch (err) {
     const newfilehandle = await fs.open(file_path, "w");
     newfilehandle.close();
-    console.log("file created successfully");
+    console.log(file_path, "file created successfully");
   }
 };
 
 (async () => {
-  const CREATE_FILE = "create a file";
-
-  const watcher = fs.watch("./command.txt");
+  const CREATE_FILE = "create a file"; //eg. create a file one.js
+  const DELETE_FILE = "delete the file"; //eg. delete the file one.js
+  const RENAME_FILE = "rename the file"; //eg. rename the file one.js to two.js
+  const ADD_TO_FILE = "add to the file"; //eg. add to file two.js with content: whatever the content is...
 
   const commandFileHandler = await fs.open("./command.txt");
+
+  const watcher = fs.watch("./command.txt");
 
   commandFileHandler.on("change", async () => {
     // get the size of our file
@@ -39,9 +42,52 @@ const createFile = async (file_path) => {
     await commandFileHandler.read(buff, offset, length, position);
     const command = ("string data", buff.toString("utf-8"));
 
+    // create a file <path>
     if (command.includes(CREATE_FILE)) {
       const file_path = command.substring(CREATE_FILE.length + 1);
       createFile(file_path);
+    }
+
+    // delete the file <path>
+    if (command.includes(DELETE_FILE)) {
+      const file_path = command.substring(DELETE_FILE.length + 1);
+      console.log(`delete the file ${file_path}`);
+    }
+
+    // rename the file <old_path> to <new_path>
+    if (command.includes(RENAME_FILE)) {
+      const support_content_index = command.indexOf(" to ");
+      const support_content_length = " to ".length;
+
+      const old_file_path = command.substring(
+        RENAME_FILE.length + 1,
+        support_content_index
+      );
+
+      const new_file_path = command.substring(
+        support_content_index + support_content_length
+      );
+
+      console.log("old_file_path", old_file_path);
+      console.log("new_file_path", new_file_path);
+    }
+
+    // add to the file <path> with content: <data>
+    if (command.includes(ADD_TO_FILE)) {
+      const support_content_index = command.indexOf(" with content: ");
+      const support_content_length = " with content: ".length;
+
+      const file_path = command.substring(
+        ADD_TO_FILE.length + 1,
+        support_content_index
+      );
+
+      const content = command.substring(
+        support_content_index + support_content_length
+      );
+
+      console.log("file_path", file_path);
+      console.log("content", content);
     }
   });
 
