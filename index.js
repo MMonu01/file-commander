@@ -20,7 +20,20 @@ const deleteFile = async (file_path) => {
     if (err.code === "ENOENT") {
       console.log("no such file to remove");
     } else {
-      console.log("something went wrong when deleting the file");
+      console.log("something went wrong while deleting the file");
+      console.log(err);
+    }
+  }
+};
+
+const renameFile = async (old_file_path, new_file_path) => {
+  try {
+    await fs.rename(old_file_path, new_file_path);
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      console.log("no such file to rename or destination does not exits");
+    } else {
+      console.log("something went wrong while renaming the file");
       console.log(err);
     }
   }
@@ -81,8 +94,7 @@ const deleteFile = async (file_path) => {
         support_content_index + support_content_length
       );
 
-      console.log("old_file_path", old_file_path);
-      console.log("new_file_path", new_file_path);
+      renameFile(old_file_path, new_file_path);
     }
 
     // add to the file <path> with content: <data>
