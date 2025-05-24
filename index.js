@@ -1,7 +1,21 @@
 const fs = require("fs/promises");
 const { Buffer } = require("node:buffer");
 
+const createFile = async (file_path) => {
+  try {
+    const existingfilehandle = await fs.open(file_path, "r");
+    existingfilehandle.close();
+    console.log("file is already created");
+  } catch (err) {
+    const newfilehandle = await fs.open(file_path, "w");
+    newfilehandle.close();
+    console.log("file created successfully");
+  }
+};
+
 (async () => {
+  const CREATE_FILE = "create a file";
+
   const watcher = fs.watch("./command.txt");
 
   const commandFileHandler = await fs.open("./command.txt");
@@ -22,13 +36,13 @@ const { Buffer } = require("node:buffer");
     // position from which to start reading the file
     const position = 0;
 
-    const content = await commandFileHandler.read(
-      buff,
-      offset,
-      length,
-      position
-    );
-    console.log(content);
+    await commandFileHandler.read(buff, offset, length, position);
+    const command = ("string data", buff.toString("utf-8"));
+
+    if (command.includes(CREATE_FILE)) {
+      const file_path = command.substring(CREATE_FILE.length + 1);
+      createFile(file_path);
+    }
   });
 
   for await (const event of watcher) {
