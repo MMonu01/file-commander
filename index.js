@@ -13,6 +13,19 @@ const createFile = async (file_path) => {
   }
 };
 
+const deleteFile = async (file_path) => {
+  try {
+    await fs.unlink(file_path);
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      console.log("no such file to remove");
+    } else {
+      console.log("something went wrong when deleting the file");
+      console.log(err);
+    }
+  }
+};
+
 (async () => {
   const CREATE_FILE = "create a file"; //eg. create a file one.js
   const DELETE_FILE = "delete the file"; //eg. delete the file one.js
@@ -51,7 +64,7 @@ const createFile = async (file_path) => {
     // delete the file <path>
     if (command.includes(DELETE_FILE)) {
       const file_path = command.substring(DELETE_FILE.length + 1);
-      console.log(`delete the file ${file_path}`);
+      deleteFile(file_path);
     }
 
     // rename the file <old_path> to <new_path>
